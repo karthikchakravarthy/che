@@ -72,6 +72,10 @@ import {ChePopup} from './popup/che-popup.directive';
 import {CheModalPopup} from './popup/che-modal-popup.directive';
 import {CheShowArea} from './show-area/che-show-area.directive';
 import {DemoSourceRender} from './html-source/demo-source-render.directive';
+import {ToggleSingleButton} from './toggle-button/toggle-single-button.directive';
+import {CheToggleJoinedButton} from './toggle-button/che-toggle-joined-button.directive';
+import {CheToggleJoined} from './toggle-button/che-toggle-joined.directive';
+
 import {CheEditor} from './editor/che-editor.directive';
 import {CheEditorController} from './editor/che-editor.controller';
 import {PagingButtons} from './paging-button/paging-button.directive';
@@ -156,6 +160,9 @@ export class WidgetConfig {
       .controller('CheToggleController', CheToggleController)
       .directive('cheToggleButton', CheToggleButton)
       .directive('cheToggle', CheToggle)
+      .directive('cheToggleJoined', CheToggleJoined)
+      .directive('cheToggleJoinedButton', CheToggleJoinedButton)
+      .directive('toggleSingleButton', ToggleSingleButton)
 
       .directive('cheToolbar', CheToolbar)
       // notifications
