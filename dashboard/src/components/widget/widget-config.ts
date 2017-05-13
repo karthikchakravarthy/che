@@ -55,6 +55,7 @@ import {CheLoaderCrane} from './loader/che-loader-crane.directive';
 import {ChePanelCtrl} from './panel/che-panel.controller';
 import {ChePanel} from './panel/che-panel.directive';
 import {CheSearch} from './search/che-search.directive';
+import {SearchInput} from './search/search-input.directive';
 import {CheSelect} from './select/che-select.directive';
 import {CheSelecterCtrl} from './selecter/che-selecter.controller';
 import {CheSelecter} from './selecter/che-selecter.directive';
@@ -139,6 +140,7 @@ export class WidgetConfig {
       .directive('chePanel', ChePanel)
 
       .directive('cheSearch', CheSearch)
+      .directive('searchInput', SearchInput)
 
       .directive('cheSelect', CheSelect)
 
