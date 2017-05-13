@@ -75,6 +75,7 @@ import {DemoSourceRender} from './html-source/demo-source-render.directive';
 import {ToggleSingleButton} from './toggle-button/toggle-single-button.directive';
 import {CheToggleJoinedButton} from './toggle-button/che-toggle-joined-button.directive';
 import {CheToggleJoined} from './toggle-button/che-toggle-joined.directive';
+import {CheChipsList} from './chips-list/chips-list.directive';
 
 import {CheEditor} from './editor/che-editor.directive';
 import {CheEditorController} from './editor/che-editor.controller';
@@ -173,6 +174,8 @@ export class WidgetConfig {
       .directive('cheModalPopup', CheModalPopup)
       // show area
       .directive('cheShowArea', CheShowArea)
+      // tags
+      .directive('cheChipsList', CheChipsList)
       // editor
       .controller('CheEditorController', CheEditorController)
       .directive('cheEditor', CheEditor);
