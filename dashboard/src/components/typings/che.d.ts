@@ -8,9 +8,12 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  */
-import che = _che;
 
-declare namespace _che {
+declare module 'che' {
+  export = che;
+}
+
+declare namespace che {
 
   export interface IRootScopeService extends ng.IRootScopeService {
     hideLoader: boolean;
