@@ -53,6 +53,11 @@ import {NamespaceSelectorController} from './create-workspace/namespace-selector
 import {NamespaceSelectorSvc} from './create-workspace/namespace-selector/namespace-selector.service';
 import {NamespaceSelector} from './create-workspace/namespace-selector/namespace-selector.directive';
 
+import {TemplateSelectorController} from './create-workspace/project-source-selector/template-selector/template-selector.controller';
+import {TemplateSelectorSvc} from './create-workspace/project-source-selector/template-selector/template-selector.service';
+import {TemplateSelector} from './create-workspace/project-source-selector/template-selector/template-selector.directive';
+import {TemplateSelectorItem} from './create-workspace/project-source-selector/template-selector/template-selector-item/template-selector-item.directive';
+
 import {CheWorkspaceRamAllocationSliderController} from './workspace-ram-slider/che-workspace-ram-allocation-slider.controller';
 import {CheWorkspaceRamAllocationSlider} from './workspace-ram-slider/che-workspace-ram-allocation-slider.directive';
 import {WorkspaceStatus} from './workspace-status/workspace-status.directive';
@@ -166,6 +171,10 @@ export class WorkspacesConfig {
     register.service('namespaceSelectorSvc', NamespaceSelectorSvc);
     register.directive('namespaceSelector', NamespaceSelector);
 
+    register.controller('TemplateSelectorController', TemplateSelectorController);
+    register.service('templateSelectorSvc', TemplateSelectorSvc);
+    register.directive('templateSelector', TemplateSelector);
+    register.directive('templateSelectorItem', TemplateSelectorItem);
     register.controller('CheStackLibraryFilterController', CheStackLibraryFilterController);
     register.directive('cheStackLibraryFilter', CheStackLibraryFilter);
 
