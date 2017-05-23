@@ -92,6 +92,8 @@ import {StackSelectorScopeFilter} from './create-workspace/stack-selector/stack-
 import {StackSelectorSearchFilter} from './create-workspace/stack-selector/stack-selector-search.filter';
 import {StackSelectorTagsFilter} from './create-workspace/stack-selector/stack-selector-tags.filter';
 
+import {CreateWorkspaceController} from './create-workspace/create-workspace.controller';
+import {CreateWorkspaceSvc} from './create-workspace/create-workspace.service';
 
 /**
  * @ngdoc controller
@@ -175,6 +177,7 @@ export class WorkspacesConfig {
     register.service('templateSelectorSvc', TemplateSelectorSvc);
     register.directive('templateSelector', TemplateSelector);
     register.directive('templateSelectorItem', TemplateSelectorItem);
+
     register.controller('CheStackLibraryFilterController', CheStackLibraryFilterController);
     register.directive('cheStackLibraryFilter', CheStackLibraryFilter);
 
@@ -202,6 +205,9 @@ export class WorkspacesConfig {
     register.controller('ListAgentsController', ListAgentsController);
     register.directive('listAgents', ListAgents);
 
+    register.controller('CreateWorkspaceController', CreateWorkspaceController);
+    register.service('createWorkspaceSvc', CreateWorkspaceSvc);
+
     // config routes
     register.app.config(($routeProvider: che.route.IRouteProvider) => {
       $routeProvider.accessWhen('/workspaces', {
@@ -215,6 +221,12 @@ export class WorkspacesConfig {
         templateUrl: 'app/workspaces/workspace-details/workspace-details.html',
         controller: 'WorkspaceDetailsController',
         controllerAs: 'workspaceDetailsController'
+      })
+      .accessWhen('/create-workspace-new', {
+        title: 'New Workspace',
+        templateUrl: 'app/workspaces/create-workspace/create-workspace.html',
+        controller: 'CreateWorkspaceController',
+        controllerAs: 'createWorkspaceController'
       })
       .accessWhen('/create-workspace', {
         title: 'New Workspace',
