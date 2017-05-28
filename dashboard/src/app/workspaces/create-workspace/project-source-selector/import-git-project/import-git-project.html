@@ -1,0 +1,17 @@
+<div class="import-git">
+  <form name="importGitProjectForm">
+    <che-input-box che-form="importGitProjectForm"
+                   che-name="remoteGitURL"
+                   che-label-name="Git URL"
+                   che-place-holder="Url of the git repository"
+                   aria-label="Url of the git repository"
+                   che-width="auto"
+                   ng-change="importGitProjectController.onChanged()"
+                   ng-model="importGitProjectController.location"
+                   git-url
+                   required>
+      <div ng-message="gitUrl">Invalid Git URL</div>
+      <div ng-message="required">A repository URL is required.</div>
+    </che-input-box>
+  </form>
+</div>
