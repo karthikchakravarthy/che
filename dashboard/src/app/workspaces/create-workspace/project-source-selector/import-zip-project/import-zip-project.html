@@ -1,0 +1,20 @@
+<div class="import-zip">
+  <form name="importZipProjectForm">
+    <che-input-box che-form="importZipProjectForm"
+                   che-name="remoteZipURL"
+                   che-label-name="Zip URL"
+                   che-place-holder="Url of the zip file"
+                   aria-label="Url of the zip file"
+                   che-width="auto"
+                   ng-change="importZipProjectController.onChanged()"
+                   ng-model="importZipProjectController.location"
+                   required>
+      <div ng-message="required">A zip URL is required.</div>
+    </che-input-box>
+    <md-checkbox ng-model="importZipProjectController.skipFirstLevel"
+                 ng-change="importZipProjectController.onChanged()"
+                 aria-label="Skip the root folder of the archive">
+      Skip the root folder of the archive
+    </md-checkbox>
+  </form>
+</div>
