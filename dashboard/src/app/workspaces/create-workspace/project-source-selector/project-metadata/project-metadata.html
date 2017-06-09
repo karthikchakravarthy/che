@@ -1,0 +1,67 @@
+<div class="project-metadata">
+  <form name="projectMetadataForm">
+
+    <!-- Project name -->
+    <che-input-box che-form="projectMetadataForm"
+                   che-name="name"
+                   che-label-name="Project Name"
+                   che-place-holder="Name of the project"
+                   aria-label="Name of the project"
+                   ng-model="projectMetadataController.template.name"
+                   ng-change="projectMetadataController.onMetadataChanged()"
+                   required
+                   custom-validator="projectMetadataController.isNameUnique($value)"
+                   ng-maxlength="128"
+                   ng-pattern="/^[A-Za-z0-9_\-\.]+$/">
+      <div ng-message="required">A name is required.</div>
+      <div ng-message="customValidator">This project name is already used.</div>
+      <div ng-message="pattern">The name should not contain special characters like space, dollar, etc.</div>
+      <div ng-message="maxlength">The name has to be less than 128 characters long.</div>
+      <div ng-message="md-maxlength">The name has to be less than 128 characters long.</div>
+    </che-input-box>
+
+    <!-- Project description -->
+    <che-input-box che-form="projectMetadataForm"
+                   che-name="description"
+                   che-label-name="Description"
+                   che-place-holder="Description of the project"
+                   aria-label="Description of the project"
+                   ng-model="projectMetadataController.template.description"
+                   ng-change="projectMetadataController.onMetadataChanged()"
+                   ng-maxlength="256">
+      <div ng-message="maxlength">The name has to be less than 128 characters long.</div>
+      <div ng-message="md-maxlength">The name has to be less than 128 characters long.</div>
+    </che-input-box>
+
+    <!-- Git URL -->
+    <che-inputbox ng-if="projectMetadataController.template.sourceType==='git'"
+                  che-form="projectMetadataForm"
+                  che-name="gitURL"
+                  che-label-name="Repository URL"
+                  che-place-holder="Url of the git repository"
+                  aria-label="Url of the git repository"
+                  che-width="auto"
+                  ng-model="projectMetadataController.template.sourceLocation"
+                  ng-change="projectMetadataController.onMetadataChanged()"
+                  git-url
+                  required>
+      <div ng-message="gitUrl">Invalid Git URL</div>
+      <div ng-message="required">A repository URL is required.</div>
+    </che-inputbox>
+
+    <!-- Zip URL -->
+    <che-inputbox ng-if="projectMetadataController.template.sourceType==='zip'"
+                  che-form="createProjectZipForm"
+                  che-name="zipURL"
+                  che-label-name="ZIP file URL"
+                  che-place-holder="Url of the zip file"
+                  aria-label="Url of the zip file"
+                  che-width="auto"
+                  ng-model="projectMetadataController.template.sourceLocation"
+                  ng-change="projectMetadataController.onMetadataChanged()"
+                  required>
+      <div ng-message="required">A zip URL is required.</div>
+    </che-inputbox>
+
+  </form>
+</div>
