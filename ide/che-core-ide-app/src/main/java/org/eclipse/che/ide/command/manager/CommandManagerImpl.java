@@ -33,14 +33,12 @@ import org.eclipse.che.ide.api.command.CommandType;
 import org.eclipse.che.ide.api.command.CommandTypeRegistry;
 import org.eclipse.che.ide.api.command.CommandUpdatedEvent;
 import org.eclipse.che.ide.api.command.CommandsLoadedEvent;
-import org.eclipse.che.ide.api.machine.WsAgentServerRunningEvent;
 import org.eclipse.che.ide.api.machine.WsAgentServerStoppedEvent;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
-import org.eclipse.che.ide.api.workspace.model.MachineImpl;
-import org.eclipse.che.ide.api.workspace.model.WorkspaceImpl;
+import org.eclipse.che.ide.api.workspace.WorkspaceReadyEvent;
 import org.eclipse.che.ide.util.loging.Log;
 
 import java.util.Arrays;
@@ -90,21 +88,23 @@ public class CommandManagerImpl implements CommandManager {
 
         commands = new HashMap<>();
 
-        eventBus.addHandler(WsAgentServerRunningEvent.TYPE, e -> initialize());
+//        eventBus.addHandler(WsAgentServerRunningEvent.TYPE, e -> initialize());
         eventBus.addHandler(WsAgentServerStoppedEvent.TYPE, e -> initialize());
+//        eventBus.addHandler(IdeInitializedEvent.TYPE, e -> initialize());
+        eventBus.addHandler(WorkspaceReadyEvent.getType(), e -> initialize());
 
-        initialize();
+//        initialize();
     }
 
     private void initialize() {
         commands.clear();
 
-        final WorkspaceImpl workspace = appContext.getWorkspace();
-        final Optional<MachineImpl> devMachine = workspace.getDevMachine();
-
-        if (!devMachine.isPresent()) {
-            return;
-        }
+//        final WorkspaceImpl workspace = appContext.getWorkspace();
+//        final Optional<MachineImpl> devMachine = workspace.getDevMachine();
+//
+//        if (!devMachine.isPresent()) {
+//            return;
+//        }
 
         // get all commands related to the workspace
         workspaceCommandManager.getCommands()
@@ -224,6 +224,7 @@ public class CommandManagerImpl implements CommandManager {
                                               @Nullable String commandLine,
                                               Map<String, String> attributes,
                                               ApplicableContext context) {
+        // TODO: check whether this manager is initialized (ws-agent is running)
 
         final Map<String, String> attr = new HashMap<>(attributes);
         attr.put(COMMAND_GOAL_ATTRIBUTE_NAME, goalId);
@@ -242,6 +243,8 @@ public class CommandManagerImpl implements CommandManager {
 
     @Override
     public Promise<CommandImpl> createCommand(CommandImpl command) {
+        // TODO: check whether this manager is initialized (ws-agent is running)
+
         return doCreateCommand(command).then((Function<CommandImpl, CommandImpl>)newCommand -> {
             // postpone the notification because
             // listeners should be notified after returning from #createCommand method

@@ -13,7 +13,14 @@ package org.eclipse.che.ide.bootstrap;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
-/** Fired when IDE is fully initialized. */
+import org.eclipse.che.ide.api.app.AppContext;
+
+/**
+ * Fired when essential initialization routines of the IDE application have been successfully done.
+ * In other words, when {@link AppContext} is already initialized with the current workspace's data.
+ * <p>
+ * <b>NOTE:</b> for internal using by the Basic IDE components.
+ */
 public class IdeInitializedEvent extends GwtEvent<IdeInitializedEvent.Handler> {
 
     public static final Type<IdeInitializedEvent.Handler> TYPE = new Type<>();

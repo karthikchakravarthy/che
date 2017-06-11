@@ -423,6 +423,10 @@ public class AppContextImpl implements AppContext,
 
     @Override
     public String getDevAgentEndpoint() {
+        if (runtime == null) {
+            throw new IllegalStateException("Workspace is stopped.");
+        }
+
         final String fromUrl = queryParameters.getByName("agent");
 
         if (fromUrl == null || fromUrl.isEmpty()) {

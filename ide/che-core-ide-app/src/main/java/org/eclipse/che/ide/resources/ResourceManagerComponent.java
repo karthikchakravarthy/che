@@ -14,7 +14,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.ide.api.machine.WsAgentServerRunningEvent;
+import org.eclipse.che.ide.bootstrap.IdeInitializedEvent;
 
 /**
  * Resource management component. Initializes with workspace agent.
@@ -27,6 +27,6 @@ public class ResourceManagerComponent {
 
     @Inject
     public ResourceManagerComponent(ResourceManagerInitializer initializer, EventBus eventBus) {
-        eventBus.addHandler(WsAgentServerRunningEvent.TYPE, e -> initializer.initResourceManager());
+        eventBus.addHandler(IdeInitializedEvent.TYPE, e -> initializer.initResourceManager());
     }
 }

@@ -21,10 +21,6 @@ import org.eclipse.che.ide.api.machine.ServerRunningEvent;
 import org.eclipse.che.ide.api.machine.ServerStoppedEvent;
 import org.eclipse.che.ide.api.machine.WsAgentServerRunningEvent;
 import org.eclipse.che.ide.api.machine.WsAgentServerStoppedEvent;
-import org.eclipse.che.ide.api.machine.events.WsAgentStateEvent;
-import org.eclipse.che.ide.api.machine.events.WsAgentStateHandler;
-import org.eclipse.che.ide.api.workspace.model.RuntimeImpl;
-import org.eclipse.che.ide.api.workspace.model.WorkspaceImpl;
 import org.eclipse.che.ide.context.AppContextImpl;
 import org.eclipse.che.ide.util.loging.Log;
 import org.eclipse.che.ide.workspace.WorkspaceServiceClient;
@@ -66,33 +62,5 @@ class ServerStatusEventHandler {
                             }
                         });
                     });
-    }
-
-    // TODO: remove when real events are finished
-    @Inject
-    private void fakeRunningAllServers(EventBus eventBus, AppContext appContext) {
-        eventBus.addHandler(WsAgentStateEvent.TYPE, new WsAgentStateHandler() {
-            @Override
-            public void onWsAgentStarted(WsAgentStateEvent event) {
-                final WorkspaceImpl workspace = appContext.getWorkspace();
-                final RuntimeImpl runtime = workspace.getRuntime();
-
-                if (runtime != null) {
-                    runtime.getMachines()
-                           .values()
-                           .forEach(machine -> machine
-                                   .getServers()
-                                   .values()
-                                   .forEach(server -> {
-                                       eventBus.fireEvent(new ServerRunningEvent(server.getName(), machine.getName()));
-                                   }));
-                }
-                eventBus.fireEvent(new WsAgentServerRunningEvent());
-            }
-
-            @Override
-            public void onWsAgentStopped(WsAgentStateEvent event) {
-            }
-        });
     }
 }

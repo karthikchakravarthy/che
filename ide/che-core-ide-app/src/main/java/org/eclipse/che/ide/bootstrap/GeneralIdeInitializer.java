@@ -21,12 +21,12 @@ import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.core.model.workspace.Workspace;
+import org.eclipse.che.api.core.model.workspace.WorkspaceStatus;
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
-import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
 import org.eclipse.che.ide.actions.StartUpActionsParser;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentUser;
@@ -121,7 +121,12 @@ class GeneralIdeInitializer implements IdeInitializer {
                               })
                               .then(initUI())
                               .thenPromise(aVoid -> initAppContext())
-                              .then(showUI());
+                              .then(showUI())
+                              .then(arg -> {
+                                  if (appContext.getWorkspace().getStatus() == WorkspaceStatus.RUNNING) {
+                                      eventBus.fireEvent(new IdeInitializedEvent());
+                                  }
+                              });
     }
 
     private Operation<Void> initUI() {

@@ -45,13 +45,13 @@ public class ExecuteCommandActionManager {
     private static final String COMMAND_ACTION_ID_PREFIX        = "command_";
     private static final String GOAL_ACTION_GROUP_ID_PREFIX     = "goal_";
 
-    private final Provider<CommandManager>    commandManagerProvider;
-    private final ActionManager               actionManager;
-    private final CommandsActionGroup         commandsActionGroup;
-    private final GoalPopUpGroupFactory       goalPopUpGroupFactory;
-    private final ExecuteCommandActionFactory commandActionFactory;
-    private final CommandGoalRegistry         goalRegistry;
-    private final EventBus                    eventBus;
+    private final Provider<CommandManager>      commandManagerProvider;
+    private final ActionManager                 actionManager;
+    private final CommandsActionGroup           commandsActionGroup;
+    private final GoalPopUpGroupFactory         goalPopUpGroupFactory;
+    private final ExecuteCommandActionFactory   commandActionFactory;
+    private final Provider<CommandGoalRegistry> commandGoalRegistryProvider;
+    private final EventBus                      eventBus;
 
     /** Map of command's name to an appropriate {@link ExecuteCommandAction}. */
     private final Map<String, Action>             commandActions;
@@ -64,14 +64,14 @@ public class ExecuteCommandActionManager {
                                        CommandsActionGroup commandsActionGroup,
                                        GoalPopUpGroupFactory goalPopUpGroupFactory,
                                        ExecuteCommandActionFactory commandActionFactory,
-                                       CommandGoalRegistry goalRegistry,
+                                       Provider<CommandGoalRegistry> commandGoalRegistryProvider,
                                        EventBus eventBus) {
         this.commandManagerProvider = commandManagerProvider;
         this.actionManager = actionManager;
         this.commandsActionGroup = commandsActionGroup;
         this.goalPopUpGroupFactory = goalPopUpGroupFactory;
         this.commandActionFactory = commandActionFactory;
-        this.goalRegistry = goalRegistry;
+        this.commandGoalRegistryProvider = commandGoalRegistryProvider;
         this.eventBus = eventBus;
 
         commandActions = new HashMap<>();
@@ -123,7 +123,7 @@ public class ExecuteCommandActionManager {
         String goalId = command.getGoal();
 
         if (isNullOrEmpty(goalId)) {
-            goalId = goalRegistry.getDefaultGoal().getId();
+            goalId = commandGoalRegistryProvider.get().getDefaultGoal().getId();
         }
 
         DefaultActionGroup commandGoalPopUpGroup = goalPopUpGroups.get(goalId);
@@ -156,7 +156,7 @@ public class ExecuteCommandActionManager {
             // remove action from it's action group
             String goalId = command.getGoal();
             if (isNullOrEmpty(goalId)) {
-                goalId = goalRegistry.getDefaultGoal().getId();
+                goalId = commandGoalRegistryProvider.get().getDefaultGoal().getId();
             }
 
             // remove action group if it's empty

@@ -486,8 +486,8 @@ public class StandardComponentInitializer {
     @Inject
     private TerminalInitializer terminalInitializer;
 
-    @Inject
-    private ExecuteCommandActionManager executeCommandActionManager;
+//    @Inject
+//    private ExecuteCommandActionManager executeCommandActionManager;
 
     /** Instantiates {@link StandardComponentInitializer} an creates standard content. */
     @Inject

@@ -13,7 +13,6 @@ package org.eclipse.che.ide.bootstrap;
 import com.google.gwt.core.client.Scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.PromiseError;
@@ -31,15 +30,11 @@ public class IdeBootstrap {
     }
 
     @Inject
-    void bootstrap(ExtensionInitializer extensionInitializer, EventBus eventBus, IdeInitializer ideInitializer,
-                   CurrentWorkspaceManager wsStarter) {
+    void bootstrap(IdeInitializer ideInitializer, ExtensionInitializer extensionInitializer, CurrentWorkspaceManager wsStarter) {
         ideInitializer.init()
                       .then(aVoid -> {
                           extensionInitializer.startExtensions();
                           Scheduler.get().scheduleDeferred(this::notifyShowIDE);
-
-                          eventBus.fireEvent(new IdeInitializedEvent());
-
                           wsStarter.startWorkspace(false);
                       })
                       .catchError(handleError())

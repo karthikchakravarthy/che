@@ -34,9 +34,9 @@ import org.eclipse.che.ide.api.command.CommandManager;
 import org.eclipse.che.ide.api.command.CommandRemovedEvent;
 import org.eclipse.che.ide.api.command.CommandType;
 import org.eclipse.che.ide.api.command.CommandUpdatedEvent;
+import org.eclipse.che.ide.api.command.CommandsLoadedEvent;
 import org.eclipse.che.ide.api.dialogs.DialogFactory;
 import org.eclipse.che.ide.api.editor.EditorAgent;
-import org.eclipse.che.ide.api.machine.WsAgentServerRunningEvent;
 import org.eclipse.che.ide.api.machine.WsAgentServerStoppedEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.base.BasePresenter;
@@ -102,6 +102,7 @@ public class CommandsExplorerPresenter extends BasePresenter implements Commands
         view.setDelegate(this);
 
 //        eventBus.addHandler(WsAgentServerRunningEvent.TYPE, e -> refreshView());
+        eventBus.addHandler(CommandsLoadedEvent.getType(), e -> refreshView());
         eventBus.addHandler(WsAgentServerStoppedEvent.TYPE, e -> view.setCommands(emptyMap()));
         eventBus.addHandler(CommandAddedEvent.getType(), e -> refreshViewAndSelectCommand(e.getCommand()));
         eventBus.addHandler(CommandRemovedEvent.getType(), e -> refreshView());
@@ -110,9 +111,9 @@ public class CommandsExplorerPresenter extends BasePresenter implements Commands
 
     @Override
     public void go(AcceptsOneWidget container) {
-        refreshView();
-
         container.setWidget(getView());
+
+        refreshView();
     }
 
     @Override
@@ -198,7 +199,7 @@ public class CommandsExplorerPresenter extends BasePresenter implements Commands
         };
     }
 
-    /** Refresh view and preserve current selection. */
+    /** Refresh view with preserving the current selection. */
     private void refreshView() {
         refreshViewAndSelectCommand(null);
     }

@@ -31,6 +31,7 @@ import org.eclipse.che.ide.api.event.WindowActionEvent;
 import org.eclipse.che.ide.api.event.WindowActionHandler;
 import org.eclipse.che.ide.api.machine.WsAgentServerRunningEvent;
 import org.eclipse.che.ide.api.preferences.PreferencesManager;
+import org.eclipse.che.ide.api.workspace.WorkspaceReadyEvent;
 import org.eclipse.che.ide.util.loging.Log;
 
 import java.util.Map;
@@ -67,7 +68,8 @@ public class AppStateManager {
         this.jsonFactory = jsonFactory;
         this.appContext = appContext;
 
-        eventBus.addHandler(WsAgentServerRunningEvent.TYPE, e -> restoreWorkspaceState());
+//        eventBus.addHandler(WsAgentServerRunningEvent.TYPE, e -> restoreWorkspaceState());
+        eventBus.addHandler(WorkspaceReadyEvent.getType(), e -> restoreWorkspaceState());
         eventBus.addHandler(WindowActionEvent.TYPE, new WindowActionHandler() {
             @Override
             public void onWindowClosing(WindowActionEvent event) {

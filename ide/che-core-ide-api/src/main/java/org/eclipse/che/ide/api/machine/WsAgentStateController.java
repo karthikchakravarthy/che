@@ -167,6 +167,10 @@ public class WsAgentStateController implements ConnectionOpenedHandler, Connecti
         devMachineCallbacks.clear();
 
         eventBus.fireEvent(WsAgentStateEvent.createWsAgentStartedEvent());
+
+        // real start of the ws-agent server is here (when it responds to requests)
+        // TODO: don't need it when status checker of the ws-agent server will be implemented on the server side
+//        eventBus.fireEvent(new WsAgentServerRunningEvent());
     }
 
     private void checkStateOfWsAgent(WsAgentHealthStateDto agentHealthStateDto) {

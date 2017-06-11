@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.workspace;
 
+import com.google.gwt.user.client.Timer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
@@ -19,7 +20,9 @@ import org.eclipse.che.api.workspace.shared.dto.event.WorkspaceStatusEvent;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.actions.WorkspaceSnapshotNotifier;
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.machine.ServerRunningEvent;
 import org.eclipse.che.ide.api.machine.ServerStoppedEvent;
+import org.eclipse.che.ide.api.machine.WsAgentServerRunningEvent;
 import org.eclipse.che.ide.api.machine.WsAgentServerStoppedEvent;
 import org.eclipse.che.ide.api.machine.WsAgentStateController;
 import org.eclipse.che.ide.api.machine.WsAgentURLModifier;
@@ -100,6 +103,9 @@ public class WorkspaceStatusHandler {
 
             if (workspace.getStatus() == RUNNING) {
                 handleWorkspaceRunning(workspace);
+
+                // TODO: remove when real events are finished
+                fakeRunningAllServers();
             } else if (workspace.getStatus() == STARTING) {
                 eventBus.fireEvent(new WorkspaceStartingEvent(workspace));
             } else if (workspace.getStatus() == STOPPED) {
@@ -111,6 +117,29 @@ public class WorkspaceStatusHandler {
 
             notify(serverEvent);
         });
+    }
+
+    private void fakeRunningAllServers() {
+        final WorkspaceImpl workspace = appContext.getWorkspace();
+        final RuntimeImpl runtime = workspace.getRuntime();
+
+        if (runtime != null) {
+            runtime.getMachines()
+                   .values()
+                   .forEach(machine -> machine
+                           .getServers()
+                           .values()
+                           .forEach(server -> {
+                               eventBus.fireEvent(new ServerRunningEvent(server.getName(), machine.getName()));
+                           }));
+        }
+
+        new Timer() {
+            @Override
+            public void run() {
+                eventBus.fireEvent(new WsAgentServerRunningEvent());
+            }
+        }.schedule(1000);
     }
 
     private void fakeStopAllServers() {
@@ -125,6 +154,7 @@ public class WorkspaceStatusHandler {
                            .values()
                            .forEach(server -> eventBus.fireEvent(new ServerStoppedEvent(server.getName(), machine.getName()))));
         }
+
         eventBus.fireEvent(new WsAgentServerStoppedEvent());
     }
 
