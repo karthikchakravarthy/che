@@ -65,21 +65,25 @@ public class ProjectTreeStateNotificationOperation implements BiConsumer<String,
         switch (type) {
             case CREATED: {
                 status = ADDED;
+                Log.info(getClass(), "PrjExplorer Create");
 
                 break;
             }
             case DELETED: {
                 status = REMOVED;
+                Log.info(getClass(), "PrjExplorer Deleted");
 
                 break;
             }
             case MODIFIED: {
                 status = UPDATED;
+                Log.info(getClass(), "PrjExplorer Modified");
 
                 break;
             }
             default: {
                 status = UPDATED;
+                Log.info(getClass(), "PrjExplorer Updated by default case");
 
                 break;
             }

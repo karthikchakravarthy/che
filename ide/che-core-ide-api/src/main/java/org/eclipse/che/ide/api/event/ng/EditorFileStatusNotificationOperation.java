@@ -98,9 +98,15 @@ public class EditorFileStatusNotificationOperation implements BiConsumer<String,
                 appContext.getWorkspaceRoot().synchronize(new ExternalResourceDelta(path, path, REMOVED));
                 if (notificationManager != null && !deletedFilesController.remove(stringPath)) {
                     notificationManager.notify("External operation", "File '" + name + "' is removed", SUCCESS, EMERGE_MODE);
+                    Log.info(getClass(), "*********************************" + "External operation", "File '" + name + "' is removed");
                     closeOpenedEditor(path);
                 }
 
+                break;
+            }
+            default: {
+                notificationManager.notify("????????????", "File '" + name + "' is someHow changed", SUCCESS, EMERGE_MODE);
+                Log.info(getClass(), "*********************************" + "????????????", "File '" + name + "' is someHow changed");
                 break;
             }
         }
