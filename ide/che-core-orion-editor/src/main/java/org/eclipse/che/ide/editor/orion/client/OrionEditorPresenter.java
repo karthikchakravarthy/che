@@ -17,6 +17,8 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ContextMenuEvent;
 import com.google.gwt.event.dom.client.ContextMenuHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.TimeZone;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Label;
@@ -124,10 +126,12 @@ import org.eclipse.che.ide.editor.orion.client.menu.EditorContextMenu;
 import org.eclipse.che.ide.editor.orion.client.signature.SignatureHelpView;
 import org.eclipse.che.ide.part.editor.multipart.EditorMultiPartStackPresenter;
 import org.eclipse.che.ide.resource.Path;
+import org.eclipse.che.ide.util.loging.Log;
 import org.vectomatic.dom.svg.ui.SVGResource;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -579,6 +583,9 @@ public class OrionEditorPresenter extends AbstractEditorPresenter implements Tex
 
     @Override
     public void doSave() {
+        Date date = new Date();
+        DateTimeFormat dtf = DateTimeFormat.getFormat("yyyy-MM-dd-HH-mm:ss");
+        Log.info(getClass(), " Do save " + dtf.format(date, TimeZone.createTimeZone(0)));
         doSave(new AsyncCallback<EditorInput>() {
             @Override
             public void onSuccess(final EditorInput result) {

@@ -196,7 +196,7 @@ public class EditorGroupSynchronizationImpl implements EditorGroupSynchronizatio
             replaceContent(document, newContent, oldContent, cursorPosition);
 
             notificationManager.notify("External operation", "File '" + file.getName() + "' is updated", SUCCESS, EMERGE_MODE);
-            Log.info(getClass(), "*********************************" + "External operation", "File '" + file.getName() + "' is updated");
+            Log.info(getClass(), "*********************************" + "External operation" + "File '" + file.getName() + "' is updated" + ". New content: " + newContent);
         }
     }
 

@@ -97,6 +97,7 @@ public class ReconcilerWithAutoSave implements Reconciler {
 
     private void save() {
         if (autoSaveEnabled) {
+            Log.info(getClass(), "AUTO save!!!!");
             if (editor.isDirty()) {
                 editor.doSave(new AsyncCallback<EditorInput>() {
                     @Override
