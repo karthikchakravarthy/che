@@ -92,7 +92,12 @@ public class EditorFileTracker {
         this.vfsProvider = vfsProvider;
         this.eventService = eventService;
 
-        fileOperationEventSubscriber = event -> onFileTrackingOperationReceived(event.getEndpointId(), event.getFileTrackingOperation());
+        fileOperationEventSubscriber = new EventSubscriber<FileTrackingOperationEvent>() {
+            @Override
+            public void onEvent(FileTrackingOperationEvent event) {
+                onFileTrackingOperationReceived(event.getEndpointId(), event.getFileTrackingOperation());
+            }
+        };
         eventService.subscribe(fileOperationEventSubscriber);
     }
 
@@ -196,8 +201,8 @@ public class EditorFileTracker {
         return it -> new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                hashRegistry.remove(path + endpointId);
                 if (!Files.exists(FileWatcherUtils.toNormalPath(root.toPath(), it))) {
+                    hashRegistry.remove(path + endpointId);
                     FileStateUpdateDto params = newDto(FileStateUpdateDto.class).withPath(path).withType(DELETED);
                     transmitter.newRequest()
                                .endpointId(endpointId)
