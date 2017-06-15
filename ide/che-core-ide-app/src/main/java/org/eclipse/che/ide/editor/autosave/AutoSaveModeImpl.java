@@ -110,6 +110,7 @@ public class AutoSaveModeImpl implements AutoSaveMode, EditorSettingsChangedHand
 
     @Override
     public void suspend() {
+        saveTimer.cancel();
         mode = SUSPENDED;
     }
 

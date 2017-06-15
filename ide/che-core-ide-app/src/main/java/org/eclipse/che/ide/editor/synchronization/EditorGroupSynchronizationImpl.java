@@ -15,6 +15,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import org.eclipse.che.commons.annotation.Nullable;
+import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.editor.EditorWithAutoSave;
 import org.eclipse.che.ide.api.editor.document.Document;
@@ -46,15 +47,18 @@ public class EditorGroupSynchronizationImpl implements EditorGroupSynchronizatio
     private final NotificationManager notificationManager;
     private final HandlerRegistration fileContentUpdateHandlerRegistration;
     private final Map<EditorPartPresenter, HandlerRegistration> synchronizedEditors = new HashMap<>();
+    private final EditorAgent editorAgent;
 
     private EditorPartPresenter groupLeaderEditor;
 
     @Inject
     EditorGroupSynchronizationImpl(EventBus eventBus,
                                    DocumentStorage documentStorage,
-                                   NotificationManager notificationManager) {
+                                   NotificationManager notificationManager,
+                                   EditorAgent editorAgent) {
         this.documentStorage = documentStorage;
         this.notificationManager = notificationManager;
+        this.editorAgent = editorAgent;
         fileContentUpdateHandlerRegistration = eventBus.addHandler(FileContentUpdateEvent.TYPE, this);
     }
 
@@ -146,9 +150,11 @@ public class EditorGroupSynchronizationImpl implements EditorGroupSynchronizatio
         }
 
         if (groupLeaderEditor == null) {
-            groupLeaderEditor = synchronizedEditors.keySet().iterator().next();
-            resolveAutoSave();
+            groupLeaderEditor = editorAgent.getActiveEditor();
         }
+//            groupLeaderEditor = synchronizedEditors.keySet().iterator().next();//todo what? When Does it should work?
+//            resolveAutoSave();
+//        }
 
         final VirtualFile virtualFile = groupLeaderEditor.getEditorInput().getFile();
         if (!event.getFilePath().equals(virtualFile.getLocation().toString())) {
@@ -179,8 +185,15 @@ public class EditorGroupSynchronizationImpl implements EditorGroupSynchronizatio
         final String oldContent = document.getContents();
         final TextPosition cursorPosition = document.getCursorPosition();
 
+        EditorWithAutoSave editorWithAutoSave = (EditorWithAutoSave)groupLeaderEditor;//todo instance of?
+        editorWithAutoSave.disableAutoSave();
+        Log.info(getClass(), "AutoSave should be DISABLE " + !editorWithAutoSave.isAutoSaveEnabled());
+
         if (!(virtualFile instanceof File)) {
             replaceContent(document, newContent, oldContent, cursorPosition);
+            editorWithAutoSave.enableAutoSave();
+            Log.info(getClass(), "*********************************" + "External operation" + "File ' I don't know :) " + "' is updated" + ". New content: " + newContent);
+            Log.info(getClass(), "AutoSave should be ENABLE!!!!!" + editorWithAutoSave.isAutoSaveEnabled());
             return;
         }
 
@@ -189,15 +202,23 @@ public class EditorGroupSynchronizationImpl implements EditorGroupSynchronizatio
 
         if (oldStamp == null && !Objects.equals(newContent, oldContent)) {
             replaceContent(document, newContent, oldContent, cursorPosition);
+            editorWithAutoSave.enableAutoSave();
+            Log.info(getClass(), "*********************************" + "External operation" + "File '" + file.getName() + "' is updated" + ". New content: " + newContent);
+            Log.info(getClass(), "AutoSave should be ENABLE!!!!!" + editorWithAutoSave.isAutoSaveEnabled());
             return;
         }
 
         if (!Objects.equals(oldStamp, newStamp)) {
             replaceContent(document, newContent, oldContent, cursorPosition);
-
+            editorWithAutoSave.enableAutoSave();
             notificationManager.notify("External operation", "File '" + file.getName() + "' is updated", SUCCESS, EMERGE_MODE);
             Log.info(getClass(), "*********************************" + "External operation" + "File '" + file.getName() + "' is updated" + ". New content: " + newContent);
+            Log.info(getClass(), "AutoSave should be ENABLE!!!!!" + editorWithAutoSave.isAutoSaveEnabled());
+            return;
         }
+        editorWithAutoSave.enableAutoSave();
+        Log.info(getClass(), "AutoSave should be ENABLE!!!!!" + editorWithAutoSave.isAutoSaveEnabled());
+        Log.error(getClass(), "I don't know why but we did not applied this content " + newContent);
     }
 
     private void replaceContent(Document document, String newContent, String oldContent, TextPosition cursorPosition) {
