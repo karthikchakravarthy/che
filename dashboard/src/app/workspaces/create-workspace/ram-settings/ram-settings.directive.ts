@@ -15,7 +15,6 @@
  *
  * @author Oleksii Kurinnyi
  */
-
 export class RamSettings implements ng.IDirective {
   restrict: string = 'E';
   templateUrl: string = 'app/workspaces/create-workspace/ram-settings/ram-settings.html';
