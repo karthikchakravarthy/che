@@ -15,7 +15,6 @@
  *
  * @author Oleksii Kurinnyi
  */
-
 export class NamespaceSelector implements ng.IDirective {
   restrict: string = 'E';
   templateUrl: string = 'app/workspaces/create-workspace/namespace-selector/namespace-selector.html';

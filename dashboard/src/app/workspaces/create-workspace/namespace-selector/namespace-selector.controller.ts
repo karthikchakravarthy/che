@@ -11,6 +11,11 @@
 'use strict';
 import {NamespaceSelectorSvc} from './namespace-selector.service';
 
+/**
+ * This class is handling the controller for namespace selector section.
+ *
+ * @author Oleksii Kurinnyi
+ */
 export class NamespaceSelectorController {
   /**
    * Namespace selector service.
