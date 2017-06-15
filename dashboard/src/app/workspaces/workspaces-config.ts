@@ -266,9 +266,9 @@ export class WorkspacesConfig {
       })
       .accessWhen('/create-workspace', {
         title: 'New Workspace',
-        templateUrl: 'app/workspaces/workspace-details/workspace-details.html',
-        controller: 'WorkspaceDetailsController',
-        controllerAs: 'workspaceDetailsController'
+        templateUrl: 'app/workspaces/create-workspace/create-workspace.html',
+        controller: 'CreateWorkspaceController',
+        controllerAs: 'createWorkspaceController'
       });
     });
   }
