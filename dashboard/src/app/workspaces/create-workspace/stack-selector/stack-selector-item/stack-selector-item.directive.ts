@@ -15,7 +15,6 @@
  *
  * @author Oleksii Kurinnyi
  */
-
 export class StackSelectorItem {
   restrict: string = 'E';
   templateUrl: string = 'app/workspaces/create-workspace/stack-selector/stack-selector-item/stack-selector-item.html';

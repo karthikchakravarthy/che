@@ -68,14 +68,13 @@
         </che-list-header>
         <!-- Stacks list -->
         <che-list class="stack-selector-stack-list">
-          <stack-selector-item
-            stack="stack"
-            ng-repeat="stack in stackSelectorController.stacksFiltered"
-            stack-icon-link="stackSelectorController.stackIconLinks[stack.id]"
-            stack-machines="stackSelectorController.stackMachines[stack.id]"
-            stack-id-selected="stackSelectorController.selectedStackId"
-            stack-on-click="stackSelectorController.selectStack(stackId)"
-            data-stack-id="{{stack.id}}"></stack-selector-item>
+          <stack-selector-item ng-repeat="stack in stackSelectorController.stacksFiltered"
+                               stack="stack"
+                               stack-icon-link="stackSelectorController.stackIconLinks[stack.id]"
+                               stack-machines="stackSelectorController.stackMachines[stack.id]"
+                               stack-id-selected="stackSelectorController.selectedStackId"
+                               stack-on-click="stackSelectorController.selectStack(stackId)"
+                               data-stack-id="{{stack.id}}"></stack-selector-item>
         </che-list>
       </div>
     </div>
