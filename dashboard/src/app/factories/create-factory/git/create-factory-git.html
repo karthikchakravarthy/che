@@ -10,8 +10,8 @@
       Codenvy, S.A. - initial API and implementation
 
 -->
-<form name="createFactoryGitForm">
-  <div class="create-factory-git-input">
+<div class="create-factory-git-input">
+  <form name="createFactoryGitForm">
     <che-input-box che-form="createFactoryGitForm"
                    che-label-name="Git URL"
                    che-form="createFactoryGitForm"
@@ -22,8 +22,8 @@
                    git-url
                    required>
       <div ng-message="gitUrl" ng-if="createFactoryGitCtrl.location && createFactoryGitCtrl.location.length > 0">
-        <span>Invalid Git URL</span>
+        Invalid Git URL
       </div>
     </che-input-box>
-  </div>
-</form>
+  </form>
+</div>
