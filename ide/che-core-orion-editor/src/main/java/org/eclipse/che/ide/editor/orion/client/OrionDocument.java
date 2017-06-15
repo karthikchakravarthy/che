@@ -12,6 +12,8 @@ package org.eclipse.che.ide.editor.orion.client;
 
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
+import org.eclipse.che.ide.api.resources.File;
+import org.eclipse.che.ide.api.resources.VirtualFile;
 import org.eclipse.che.ide.editor.orion.client.jso.ModelChangedEventOverlay;
 import org.eclipse.che.ide.editor.orion.client.jso.OrionEditorOverlay;
 import org.eclipse.che.ide.editor.orion.client.jso.OrionPixelPositionOverlay;
@@ -28,6 +30,7 @@ import org.eclipse.che.ide.api.editor.position.PositionConverter;
 import org.eclipse.che.ide.api.editor.text.LinearRange;
 import org.eclipse.che.ide.api.editor.text.TextPosition;
 import org.eclipse.che.ide.api.editor.text.TextRange;
+import org.eclipse.che.ide.util.TextUtils;
 
 /**
  * The implementation of {@link Document} for Orion.
@@ -197,6 +200,7 @@ public class OrionDocument extends AbstractDocument {
 
     public void replace(int offset, int length, String text) {
         this.editorOverlay.getModel().setText(text, offset, offset + length);
+        updateModificationTimeStamp();
     }
 
     @Override
@@ -205,6 +209,15 @@ public class OrionDocument extends AbstractDocument {
         int lineStart = model.getLineStart(startLine);
         int lineEnd = model.getLineStart(endLine);
         editorOverlay.setText(text, lineStart + startChar, lineEnd + endChar);
+        updateModificationTimeStamp();
+    }
+
+    private void updateModificationTimeStamp() {
+        VirtualFile file = this.getFile();
+        if (file  instanceof File) {
+            String modificationStamp = TextUtils.md5(editorOverlay.getText());
+            ((File)file).setModificationStamp(modificationStamp);
+        }
     }
 
     public int getContentsCharCount() {

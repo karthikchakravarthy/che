@@ -85,14 +85,14 @@ public class EditorFileStatusNotificationOperation implements BiConsumer<String,
 
         switch (status) {
             case MODIFIED: {
-                Log.debug(getClass(), "Received updated file event status: " + stringPath);
+                Log.info(getClass(), "Received updated file event status: " + stringPath + " hashcode " + params.getHashCode());
 
                 eventBus.fireEvent(new FileContentUpdateEvent(stringPath, params.getHashCode()));
 
                 break;
             }
             case DELETED: {
-                Log.debug(getClass(), "Received removed file event status: " + stringPath);
+                Log.info(getClass(), "Received removed file event status: " + stringPath + " hashcode " + params.getHashCode());
 
                 final Path path = Path.valueOf(stringPath);
                 appContext.getWorkspaceRoot().synchronize(new ExternalResourceDelta(path, path, REMOVED));
@@ -106,7 +106,6 @@ public class EditorFileStatusNotificationOperation implements BiConsumer<String,
             }
             default: {
                 notificationManager.notify("????????????", "File '" + name + "' is someHow changed", SUCCESS, EMERGE_MODE);
-                Log.info(getClass(), "*********************************" + "????????????" + "File '" + name + "' is someHow changed");
                 break;
             }
         }
