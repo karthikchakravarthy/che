@@ -10,6 +10,11 @@
  */
 'use strict';
 
+/**
+ * Defines a directive for the template selector.
+ *
+ * @author Oleksii Kurinnyi
+ */
 export class TemplateSelector implements ng.IDirective {
   restrict: string = 'E';
   templateUrl: string = 'app/workspaces/create-workspace/project-source-selector/template-selector/template-selector.html';

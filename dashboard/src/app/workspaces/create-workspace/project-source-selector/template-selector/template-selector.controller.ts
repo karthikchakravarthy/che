@@ -10,11 +10,15 @@
  */
 'use strict';
 
-import {ProjectSource} from '../project-source.enum';
 import {TemplateSelectorSvc} from './template-selector.service';
 import {StackSelectorSvc} from '../../stack-selector/stack-selector.service';
 import {ProjectSourceSelectorService} from '../project-source-selector.service';
 
+/**
+ * This class is handling the controller for template selector.
+ *
+ * @author Oleksii Kurinnyi
+ */
 export class TemplateSelectorController {
   /**
    * Filter service.
