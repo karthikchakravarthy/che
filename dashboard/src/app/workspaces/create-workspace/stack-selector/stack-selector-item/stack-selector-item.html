@@ -19,10 +19,11 @@
           <!-- Icon -->
           <div class="stack-selector-icon-column"
                layout="column" layout-align="center center">
-            <div class="stack-selector-item-icon"
-                 ng-class="{'blank-icon' : !stackIconLink}">
-              <img ng-hide="!stackIconLink" ng-src="{{stackIconLink}}"/>
-              <div ng-hide="stackIconLink" class="chefont cheico-type-blank"></div>
+            <div ng-if="stackIconLink" class="stack-selector-item-icon">
+              <img ng-src="{{stackIconLink}}"/>
+            </div>
+            <div ng-if="!stackIconLink" class="stack-selector-item-icon blank-icon">
+              <div class="chefont cheico-type-blank"></div>
             </div>
           </div>
 

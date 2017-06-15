@@ -77,17 +77,14 @@ export class TemplateSelectorController {
       cheListHelperFactory.removeHelper(helperId);
     });
 
-    this.allTemplates = [];
     this.filteredTemplates = [];
     this.selectedTemplates = this.templateSelectorSvc.getTemplates();
 
     this.onStackChanged();
     this.stackSelectorSvc.subscribe(this.onStackChanged.bind(this));
 
-    this.templateSelectorSvc.fetchTemplates().then(() => {
-      this.allTemplates = this.$filter('orderBy')(this.templateSelectorSvc.getAllTemplates(), ['projectType', 'displayName']);
-      this.filterAndSortTemplates();
-    });
+    this.allTemplates = this.$filter('orderBy')(this.templateSelectorSvc.getAllTemplates(), ['projectType', 'displayName']);
+    this.filterAndSortTemplates();
 
     this.projectSourceSelectorService.subscribe(this.onProjectTemplateAdded.bind(this));
   }
