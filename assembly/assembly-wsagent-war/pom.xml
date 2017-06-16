@@ -152,6 +152,7 @@
                         WEB-INF/lib/jsr305*.jar</packagingExcludes>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 </project>

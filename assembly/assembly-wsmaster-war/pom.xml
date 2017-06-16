@@ -64,6 +64,16 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.che</groupId>
+            <artifactId>bootstrapper</artifactId>
+            <type>tar.gz</type>
+            <classifier>linux_amd64</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che</groupId>
+            <artifactId>bootstrapper</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che</groupId>
             <artifactId>exec-agent</artifactId>
         </dependency>
         <dependency>
@@ -310,14 +320,16 @@
                     </execution>
                     <execution>
                         <id>resource-dependencies</id>
-                        <phase>process-test-resources</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includeArtifactIds>che-core-sql-schema</includeArtifactIds>
-                            <includes>che-schema/</includes>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <includes>**/**</includes>
+                            <includeArtifactIds>bootstrapper</includeArtifactIds>
+                            <type>tar.gz</type>
+                            <classifier>linux_amd64</classifier>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
