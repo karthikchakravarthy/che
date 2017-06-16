@@ -9,6 +9,10 @@
 //   Codenvy, S.A. - initial API and implementation
 //
 
+// Package booter (short for bootstrapper) provides facilities for
+// executing installations and streaming statuses/logs related to installation process.
+// Statuses and logs are defined by bootstrapper spec
+// see https://github.com/eclipse/che/issues/4096#issuecomment-283067971
 package booter
 
 import (
@@ -33,9 +37,10 @@ var (
 	installerTimeout time.Duration
 	checkPeriod      time.Duration
 
-	bus *event.Bus = event.NewBus()
+	bus = event.NewBus()
 )
 
+// Init sets initializes bootstrapper configuration.
 func Init(id RuntimeID, mName string, instTimeoutSec int, checkPeriodSec int) {
 	runtimeID = id
 	machineName = mName
@@ -43,24 +48,36 @@ func Init(id RuntimeID, mName string, instTimeoutSec int, checkPeriodSec int) {
 	checkPeriod = time.Second * time.Duration(checkPeriodSec)
 }
 
+// Add adds one installer to the installation sequence.
 func Add(installer Installer) {
 	installers = append(installers, installer)
 }
 
+// AddAll adds batch of installers to the installation sequence.
 func AddAll(installers []Installer) {
 	for _, installer := range installers {
 		Add(installer)
 	}
 }
 
+// PushLogs sets given tunnel as consumer of installer logs.
 func PushLogs(tun *jsonrpc.Tunnel) {
 	bus.Sub(&tunnelBroadcaster{tun}, InstallerLogEventType)
 }
 
+// PushStatuses sets given tunnel as consumer of installer/bootstrapper statuses.
 func PushStatuses(tun *jsonrpc.Tunnel) {
 	bus.SubAny(&tunnelBroadcaster{tun}, InstallerStatusChangedEventType, StatusChangedEventType)
 }
 
+// Start starts installation.
+// If there is at least one installer which defines server, this func
+// will hold until the process which started the server dies.
+// If there is no installer which provides server, this func exits after
+// all the installation are completed.
+// In both cases if any error occurs during installation,
+// start exists returning that error.
+// If any different from nil error value returned, bootstrapping should be considered as failed.
 func Start() error {
 	if len(installers) == 0 {
 		return errors.New("No installers added, nothing to start")
@@ -193,6 +210,7 @@ func pubInstallationFailed(installer string, err string) {
 	bus.Pub(&InstallerStatusChangedEvent{
 		Status:    InstallerStatusFailed,
 		Installer: installer,
+		Error:     err,
 		MachineEvent: MachineEvent{
 			MachineName: machineName,
 			RuntimeID:   runtimeID,
@@ -283,6 +301,6 @@ func (tb *tunnelBroadcaster) Close() { tb.tunnel.Close() }
 func printPlan() {
 	log.Print("Planning to install")
 	for _, installer := range installers {
-		log.Printf("- %s:%s", installer.ID, installer.Version)
+		log.Printf("- %s:%s - %s", installer.ID, installer.Version, installer.Description)
 	}
 }

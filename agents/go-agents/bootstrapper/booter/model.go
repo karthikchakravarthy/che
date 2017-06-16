@@ -11,34 +11,35 @@
 
 package booter
 
-// Installer represents configuration of entity that might be installed into machine and brings functionality
+// Installer defines installation configuration which usually
+// brings something new to the machine e.g. starts server or installs tools like 'curl'.
 type Installer struct {
-	// ID the identifier of the installer
+
+	// ID the identifier of the installer e.g. 'org.eclipse.che.exec'.
 	ID string `json:"id"`
 
-	// Description the description of the installer
+	// Description the description of the installer.
 	Description string `json:"description"`
 
-	// Version the version of the installer
+	// Version the version of the installer.
 	Version string `json:"version"`
 
-	// Script the script to be applied when machine is started
+	// Script is content of installation script.
 	Script string `json:"script"`
 
-	// Servers the mapping of server ref to server configuration
+	// Servers map of ref -> server.
 	Servers map[string]Server `json:"servers"`
 }
 
+// HasServers returns true if installer has at least one server.
 func (installer Installer) HasServers() bool { return len(installer.Servers) != 0 }
 
 // Server represents set of configuration that can be
 type Server struct {
-	// Port the server port used
+
+	// Server port in form 'port/protocol' or 'port' if protocol is tcp.
 	Port string `json:"port"`
 
-	// Protocol the protocol for configuring preview url of the server
+	// Protocol the protocol for configuring preview url of the server e.g. 'http'.
 	Protocol string `json:"protocol"`
-
-	// Path used by server
-	Path string `json:"path"`
 }

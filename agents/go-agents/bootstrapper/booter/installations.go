@@ -19,24 +19,22 @@ import (
 	"time"
 )
 
-// installation defines procedure for installer
+// Process of getting certain installer software/servers installed.
 type installation interface {
-	// preCheck performs all necessary checks before the installation process is executed,
-	// if there is no errors occurred while check then installation could be performed
+
+	// Check installation preconditions e.g. ports are free.
+	// If error is returned installation is not executed.
 	preCheck() error
-	// execute performs the installer installation
-	// installation successful only if there is not errors occurred while installation
+
+	// Executes the installation in implementation specific way.
 	execute() error
 }
 
-// scriptInst executes installer script
-// if script execution failed or the time limit exceeded then installation considered failed
-// otherwise the installation is successful
+// Script installation executes script defined by installer.
+// Installation is considered successful only if script exit code is 0.
 type scriptInst struct {
-	// installer defines the necessary set of properties for installation
 	installer Installer
-	// timeLimit defines the time limit for installation
-	timeLimit time.Duration
+	timeout   time.Duration
 }
 
 func (sci *scriptInst) preCheck() error { return nil }
@@ -44,36 +42,31 @@ func (sci *scriptInst) preCheck() error { return nil }
 func (sci *scriptInst) execute() error {
 	_, diedC, err := executeScript(sci.installer)
 	if err != nil {
-		fmt.Errorf("Scrip execution failed Error: %s", err)
+		fmt.Errorf("Scrip execution failed. Error: %s", err)
 	}
 	select {
 	case died := <-diedC:
 		if died.ExitCode != 0 {
 			return fmt.Errorf(
-				"Exit code for Installer '%s' installation is '%d' while should be 0",
+				"Exit code for '%s' installation is '%d' while expected to be 0",
 				sci.installer.ID,
 				died.ExitCode,
 			)
 		}
-	case <-time.After(sci.timeLimit):
+	case <-time.After(sci.timeout):
 		return fmt.Errorf("Timeout reached before installation of '%s' completed", sci.installer.ID)
 	}
 	return nil
 }
 
-// serverInst executes installer script and waits all the installer servers
-// if script execution failed or exceeds the time limit then installation considered failed
-// otherwise the installation is successful
+// Server installation executes script defined by installer and
+// wait all the defined servers to become available.
 type serverInst struct {
-	// installer defines the necessary set of properties for installation
 	installer Installer
-	// period defines period between servers checks
-	period time.Duration
-	// timeLimit defines the maximum time limits for the installation
-	timeLimit time.Duration
+	period    time.Duration
+	timeout   time.Duration
 }
 
-// preCheck performs pre installation checks
 func (svi *serverInst) preCheck() error {
 	for _, server := range svi.installer.Servers {
 		if tryConn(server) == nil {
@@ -93,12 +86,12 @@ func (svi *serverInst) execute() error {
 	case <-checker.allAvailable(svi.installer.Servers):
 		process.RemoveSubscriber(pid, svi.installer.ID)
 		return nil
-	case <-time.After(svi.timeLimit):
+	case <-time.After(svi.timeout):
 		checker.stop()
 		return fmt.Errorf("Timeout reached before installation of '%s' finished", svi.installer.ID)
 	case <-diedC:
 		checker.stop()
-		return fmt.Errorf("Installation of %s was interrupted", svi.installer.ID)
+		return fmt.Errorf("Process of installation '%s' exited before server became available", svi.installer.ID)
 	}
 }
 

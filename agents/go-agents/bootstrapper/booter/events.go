@@ -13,7 +13,6 @@ package booter
 
 import (
 	"time"
-	"fmt"
 )
 
 const (
@@ -64,7 +63,10 @@ const (
 )
 
 const (
+	// StderrStream value of InstallerLogEvent.Stream if log line is from process STDERR.
 	StderrStream = "STDERR"
+
+	// StdoutStream value of InstallerLogEvent.Stream if log line is from process STDOUT.
 	StdoutStream = "STDOUT"
 )
 
@@ -105,6 +107,7 @@ type StatusChangedEvent struct {
 	Error string `json:"error,omitempty"`
 }
 
+// Type returns StatusChangedEventType.
 func (e *StatusChangedEvent) Type() string { return StatusChangedEventType }
 
 // InstallerStatusChangedEvent published for each installer when its status changed.
@@ -121,6 +124,7 @@ type InstallerStatusChangedEvent struct {
 	Error string `json:"error,omitempty"`
 }
 
+// Type returns InstallerStatusChangedEventType.
 func (e *InstallerStatusChangedEvent) Type() string { return InstallerStatusChangedEventType }
 
 // InstallerLogEvent published each time installer writes to stderr/stdout.
@@ -137,6 +141,5 @@ type InstallerLogEvent struct {
 	Stream string `json:"stream"`
 }
 
+// Type returns InstallerLogEventType.
 func (e *InstallerLogEvent) Type() string { return InstallerLogEventType }
-
-func (e *InstallerLogEvent) String() string { return fmt.Sprintf("%s: %s", e.Stream, e.Text)}
