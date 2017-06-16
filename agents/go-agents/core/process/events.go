@@ -33,6 +33,10 @@ type EventConsumer interface {
 	Accept(event Event)
 }
 
+type EventConsumerFunc func(event Event)
+
+func (f EventConsumerFunc) Accept(event Event) { f(event) }
+
 // StartedEvent published once when process is started.
 type StartedEvent struct {
 	Time        time.Time `json:"time"`

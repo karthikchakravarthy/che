@@ -412,7 +412,7 @@ func RestoreSubscriber(pid uint64, subscriber Subscriber, after time.Time) error
 		p.subs = append(p.subs, &subscriber)
 	}
 
-	// Publish all the logs between (after, now]
+	// Pub all the logs between (after, now]
 	for i := 0; i < len(logs); i++ {
 		message := logs[i]
 		if message.Time.After(after) {
@@ -424,7 +424,7 @@ func RestoreSubscriber(pid uint64, subscriber Subscriber, after time.Time) error
 		}
 	}
 
-	// Publish died event after logs are published and process is dead
+	// Pub died event after logs are published and process is dead
 	if !p.Alive {
 		subscriber.Consumer.Accept(newDiedEvent(*p))
 	}
