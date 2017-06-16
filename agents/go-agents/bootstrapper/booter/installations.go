@@ -13,10 +13,11 @@ package booter
 
 import (
 	"fmt"
-	"github.com/eclipse/che/agents/go-agents/core/process"
 	"net"
 	"strings"
 	"time"
+
+	"github.com/eclipse/che/agents/go-agents/core/process"
 )
 
 // Process of getting certain installer software/servers installed.

@@ -12,8 +12,9 @@
 package event_test
 
 import (
-	"github.com/eclipse/che/agents/go-agents/core/event"
 	"testing"
+
+	"github.com/eclipse/che/agents/go-agents/core/event"
 )
 
 func TestSub(t *testing.T) {

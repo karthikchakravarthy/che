@@ -18,12 +18,12 @@ package booter
 import (
 	"errors"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/eclipse/che/agents/go-agents/core/event"
 	"github.com/eclipse/che/agents/go-agents/core/jsonrpc"
 	"github.com/eclipse/che/agents/go-agents/core/process"
-	"sync"
 )
 
 const (
@@ -72,7 +72,7 @@ func PushStatuses(tun *jsonrpc.Tunnel) {
 
 // Start starts installation.
 // If there is at least one installer which defines server, this func
-// will hold until the process which started the server dies.
+// will hold until all the processes which started the server die.
 // If there is no installer which provides server, this func exits after
 // all the installation are completed.
 // In both cases if any error occurs during installation,

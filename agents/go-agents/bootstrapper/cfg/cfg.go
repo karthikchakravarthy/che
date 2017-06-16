@@ -14,11 +14,12 @@ package cfg
 import (
 	"encoding/json"
 	"flag"
-	"github.com/eclipse/che/agents/go-agents/bootstrapper/booter"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/eclipse/che/agents/go-agents/bootstrapper/booter"
 )
 
 var (
