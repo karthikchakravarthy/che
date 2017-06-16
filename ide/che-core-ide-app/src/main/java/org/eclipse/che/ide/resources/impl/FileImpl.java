@@ -110,7 +110,7 @@ class FileImpl extends ResourceImpl implements File {
     /** {@inheritDoc} */
     @Override
     public Promise<Void> updateContent(String content) {
-       updateModificationStamp(content);
+        updateModificationStamp(content);
 
         return resourceManager.write(this, content);
     }

@@ -49,7 +49,7 @@ import static org.eclipse.che.ide.api.editor.autosave.AutoSaveMode.Mode.SUSPENDE
  * @author Roman Nikitenko
  */
 public class AutoSaveModeImpl implements AutoSaveMode, EditorSettingsChangedHandler, ActivePartChangedHandler, EditorOpenedEventHandler {
-    private static final int DELAY = 5000;
+    private static final int DELAY = 1000;
 
     private EventBus                      eventBus;
     private EditorPreferencesManager      editorPreferencesManager;
@@ -67,7 +67,6 @@ public class AutoSaveModeImpl implements AutoSaveMode, EditorSettingsChangedHand
     private final Timer saveTimer = new Timer() {
         @Override
         public void run() {
-            Log.info(getClass(), "auto SAVE!!!!!!!!");
             save();
         }
     };
