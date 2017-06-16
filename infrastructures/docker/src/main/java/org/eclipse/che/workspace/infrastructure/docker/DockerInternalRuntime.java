@@ -25,7 +25,6 @@ import org.eclipse.che.api.workspace.server.spi.InternalMachineConfig;
 import org.eclipse.che.api.workspace.server.spi.InternalRuntime;
 import org.eclipse.che.api.workspace.shared.dto.event.MachineStatusEvent;
 import org.eclipse.che.dto.server.DtoFactory;
-import org.eclipse.che.plugin.docker.client.MessageProcessor;
 import org.eclipse.che.workspace.infrastructure.docker.exception.SourceNotFoundException;
 import org.eclipse.che.workspace.infrastructure.docker.model.DockerBuildContext;
 import org.eclipse.che.workspace.infrastructure.docker.model.DockerContainerConfig;
@@ -66,6 +65,7 @@ public class DockerInternalRuntime extends InternalRuntime<DockerRuntimeContext>
     private final DockerRegistryClient dockerRegistryClient;
     private final RuntimeIdentity      identity;
     private final EventService         eventService;
+    private final BootstrapperFactory  bootstrapperFactory;
 
     public DockerInternalRuntime(DockerRuntimeContext context,
                                  String devMachineName,
@@ -78,12 +78,14 @@ public class DockerInternalRuntime extends InternalRuntime<DockerRuntimeContext>
                                  SnapshotDao snapshotDao,
                                  DockerRegistryClient dockerRegistryClient,
                                  RuntimeIdentity identity,
-                                 EventService eventService) {
+                                 EventService eventService,
+                                 BootstrapperFactory bootstrapperFactory) {
         super(context, urlRewriter);
         this.devMachineName = devMachineName;
         this.dockerEnvironment = dockerEnvironment;
         this.identity = identity;
         this.eventService = eventService;
+        this.bootstrapperFactory = bootstrapperFactory;
         this.properties = new HashMap<>();
         this.startSynchronizer = new StartSynchronizer();
         this.contextsStorage = contextsStorage;
@@ -200,27 +202,16 @@ public class DockerInternalRuntime extends InternalRuntime<DockerRuntimeContext>
                                                         identity,
                                                         isDev);
         }
-        startAgents(name, dockerMachine);
-        return dockerMachine;
-    }
 
-    // TODO rework to agent launchers
-    private void startAgents(String machineName, DockerMachine dockerMachine) throws InfrastructureException {
-        InternalMachineConfig machineConfig = getContext().getMachineConfigs().get(machineName);
+        InternalMachineConfig machineConfig = getContext().getMachineConfigs().get(name);
         if (machineConfig == null) {
             throw new InfrastructureException("Machine %s is not found in internal machines config of RuntimeContext");
         }
-        for (InternalMachineConfig.ResolvedAgent resolvedAgent : machineConfig.getAgents()) {
-            Thread thread = new Thread(() -> {
-                try {
-                    dockerMachine.exec(resolvedAgent.getScript(), MessageProcessor.getDevNull());
-                } catch (InfrastructureException e) {
-                    LOG.error(e.getLocalizedMessage(), e);
-                }
-            });
-            thread.setDaemon(true);
-            thread.start();
-        }
+
+        bootstrapperFactory.create(name, identity, dockerMachine, machineConfig.getAgents())
+                           .bootstrap();
+
+        return dockerMachine;
     }
 
     private DockerContainerConfig normalizeSource(DockerContainerConfig containerConfig,

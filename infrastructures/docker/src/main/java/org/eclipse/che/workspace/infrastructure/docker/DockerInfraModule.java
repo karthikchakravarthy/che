@@ -108,5 +108,9 @@ public class DockerInfraModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                         .implement(DockerRuntimeContext.class, DockerRuntimeContext.class)
                         .build(RuntimeFactory.class));
+
+        install(new FactoryModuleBuilder()
+                        .implement(Bootstrapper.class, Bootstrapper.class)
+                        .build(BootstrapperFactory.class));
     }
 }

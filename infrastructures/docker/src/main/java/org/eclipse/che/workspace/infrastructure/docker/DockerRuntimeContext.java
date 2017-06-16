@@ -25,13 +25,10 @@ import org.eclipse.che.api.workspace.server.spi.RuntimeContext;
 import org.eclipse.che.api.workspace.shared.Utils;
 import org.eclipse.che.workspace.infrastructure.docker.model.DockerEnvironment;
 import org.eclipse.che.workspace.infrastructure.docker.snapshot.SnapshotDao;
-import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import java.net.URL;
 import java.util.List;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author Alexander Garagatyi
@@ -48,8 +45,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 // TODO Check if interruption came from stop or because of another reason
 // TODO if because of another reason stop environment
 public class DockerRuntimeContext extends RuntimeContext {
-    private static final Logger LOG = getLogger(DockerRuntimeContext.class);
-
     private final NetworkLifecycle     dockerNetworkLifecycle;
     private final MachineStarter       serviceStarter;
     private final DockerEnvironment    dockerEnvironment;
@@ -60,6 +55,7 @@ public class DockerRuntimeContext extends RuntimeContext {
     private final SnapshotDao          snapshotDao;
     private final DockerRegistryClient dockerRegistryClient;
     private final EventService         eventService;
+    private final BootstrapperFactory  bootstrapperFactory;
 
     @Inject
     public DockerRuntimeContext(@Assisted DockerRuntimeInfrastructure infrastructure,
@@ -75,7 +71,8 @@ public class DockerRuntimeContext extends RuntimeContext {
                                 ContextsStorage contextsStorage,
                                 SnapshotDao snapshotDao,
                                 DockerRegistryClient dockerRegistryClient,
-                                EventService eventService)
+                                EventService eventService,
+                                BootstrapperFactory bootstrapperFactory)
             throws ValidationException, InfrastructureException {
         super(environment, identity, infrastructure, agentSorter, agentRegistry);
         this.devMachineName = Utils.getDevMachineName(environment);
@@ -88,6 +85,7 @@ public class DockerRuntimeContext extends RuntimeContext {
         this.snapshotDao = snapshotDao;
         this.dockerRegistryClient = dockerRegistryClient;
         this.eventService = eventService;
+        this.bootstrapperFactory = bootstrapperFactory;
     }
 
     @Override
@@ -113,6 +111,7 @@ public class DockerRuntimeContext extends RuntimeContext {
                                          snapshotDao,
                                          dockerRegistryClient,
                                          identity,
-                                         eventService);
+                                         eventService,
+                                         bootstrapperFactory);
     }
 }
