@@ -379,7 +379,7 @@ public class DockerInternalRuntime extends InternalRuntime<DockerRuntimeContext>
         }
 
         public synchronized Map<String, ? extends Machine> getMachines() {
-            return Collections.unmodifiableMap(machines);
+            return machines == null ? Collections.emptyMap() : Collections.unmodifiableMap(machines);
         }
 
         public synchronized void addMachine(String name, DockerMachine machine) throws InternalInfrastructureException {

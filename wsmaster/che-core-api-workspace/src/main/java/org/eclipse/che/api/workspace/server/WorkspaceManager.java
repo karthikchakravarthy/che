@@ -485,19 +485,11 @@ public class WorkspaceManager {
 
         states.put(workspace.getId(), WorkspaceStatus.STARTING);
         return runtimes.startAsync(workspace, env, firstNonNull(options, Collections.emptyMap()))
-                       .thenRunAsync(ThreadLocalPropagateContext.wrap(() -> {
-                           states.put(workspace.getId(), WorkspaceStatus.RUNNING);
-
-                           LOG.info("Workspace '{}:{}' with id '{}' started by user '{}'",
-                                    workspace.getNamespace(),
-                                    workspace.getConfig().getName(),
-                                    workspace.getId(),
-                                    sessionUserNameOr("undefined"));
-                       }))
                        .exceptionally(ex -> {
                            if (workspace.isTemporary()) {
                                removeWorkspaceQuietly(workspace);
                            }
+                           states.remove(workspace.getId());
                            for (Throwable cause : getCausalChain(ex)) {
                                // TODO spi
 //                    if (cause instanceof SourceNotFoundException) {
@@ -506,7 +498,16 @@ public class WorkspaceManager {
                            }
                            LOG.error(ex.getLocalizedMessage(), ex);
                            return null;
-                       });
+                       })
+                       .thenRun(ThreadLocalPropagateContext.wrap(() -> {
+                           states.put(workspace.getId(), WorkspaceStatus.RUNNING);
+
+                           LOG.info("Workspace '{}:{}' with id '{}' started by user '{}'",
+                                    workspace.getNamespace(),
+                                    workspace.getConfig().getName(),
+                                    workspace.getId(),
+                                    sessionUserNameOr("undefined"));
+                       }));
 
 
     }
