@@ -18,7 +18,7 @@ interface IInputBoxScope extends ng.IScope {
   placeHolder?: string;
   pattern?: string;
   myForm: ng.IFormController;
-  isChanged: Function;
+  onChange?: Function;
 }
 
 /**
@@ -27,7 +27,7 @@ interface IInputBoxScope extends ng.IScope {
  * @author Ann Shumilova
  * @author Oleksii Orel
  */
-export class CheInputBox implements ng.IDirective {
+export class CheInputBox {
   restrict = 'E';
   replace = true;
   transclude = true;
@@ -43,7 +43,8 @@ export class CheInputBox implements ng.IDirective {
     labelName: '@?cheLabelName',
     labelDescription: '@?cheLabelDescription',
     placeHolder: '@?chePlaceHolder',
-    myForm: '=cheForm'
+    myForm: '=cheForm',
+    onChange: '&?cheOnChange'
   };
 
 
@@ -95,6 +96,9 @@ export class CheInputBox implements ng.IDirective {
     const required = 'required';
     if (angular.isDefined($scope.placeHolder)) {
       inputJqEl.attr('placeholder', attrs.$attr[required] === required ? $scope.placeHolder + ' *' : $scope.placeHolder);
+    }
+    if (!angular.isFunction($scope.onChange)) {
+      inputJqEl.removeAttr('ng-change');
     }
   }
 }
