@@ -105,9 +105,7 @@ func Parse() {
 	}
 
 	// push-logs-endpoint
-	if len(PushLogsEndpoint) == 0 {
-		PushLogsEndpoint = PushStatusesEndpoint
-	} else if !strings.HasPrefix(PushLogsEndpoint, "ws") {
+	if len(PushLogsEndpoint) != 0 && !strings.HasPrefix(PushLogsEndpoint, "ws") {
 		log.Fatal("Push logs endpoint protocol must be either ws or wss")
 	}
 

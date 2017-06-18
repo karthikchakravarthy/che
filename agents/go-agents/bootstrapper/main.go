@@ -35,16 +35,18 @@ func main() {
 	)
 	booter.AddAll(cfg.ReadInstallersConfig())
 
-	var statusesEndpoint *jsonrpc.Tunnel = connect(cfg.PushStatusesEndpoint)
-	var logsEndpoint *jsonrpc.Tunnel
-	if cfg.PushStatusesEndpoint == cfg.PushLogsEndpoint {
-		logsEndpoint = statusesEndpoint
-	} else {
-		logsEndpoint = connect(cfg.PushLogsEndpoint)
-	}
+	// push status
+	statusTun := connect(cfg.PushStatusesEndpoint)
+	booter.PushStatuses(statusTun)
 
-	booter.PushStatuses(statusesEndpoint)
-	booter.PushLogs(logsEndpoint)
+	// push logs
+	if len(cfg.PushLogsEndpoint) != 0 {
+		if cfg.PushLogsEndpoint == cfg.PushStatusesEndpoint {
+			booter.PushLogs(statusTun)
+		} else {
+			booter.PushLogs(connect(cfg.PushLogsEndpoint))
+		}
+	}
 
 	if err := booter.Start(); err != nil {
 		log.Fatal(err)
