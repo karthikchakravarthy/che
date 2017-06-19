@@ -33,7 +33,7 @@ const (
 	// is ready and soon will start installations.
 	StatusStarting = "STARTING"
 
-	// StatusDone published after all the installations successfully pubBootstrappingDone.
+	// StatusDone published after all the installations successfully finished.
 	// The opposite event would be of type StatusFailed.
 	StatusDone = "DONE"
 
@@ -117,7 +117,7 @@ type InstallerStatusChangedEvent struct {
 	// Status is current status of installer.
 	Status string `json:"status"`
 
-	// Installer is identifier of installer like "org.eclipse.che.ws-installer"
+	// Installer is identifier of installer like "org.eclipse.che.ws-agent"
 	Installer string `json:"installer"`
 
 	// Error error message, can be present only if status is FAILED.
@@ -134,7 +134,7 @@ type InstallerLogEvent struct {
 	// Text is written by installation line of text.
 	Text string `json:"text"`
 
-	// Installer is identifier of installer like "org.eclipse.che.ws-installer"
+	// Installer is identifier of installer like "org.eclipse.che.ws-agent"
 	Installer string `json:"installer"`
 
 	// Stream defines whether it is STDERR or STDOUT
