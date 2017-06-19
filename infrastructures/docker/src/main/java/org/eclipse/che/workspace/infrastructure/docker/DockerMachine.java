@@ -26,6 +26,7 @@ import org.eclipse.che.plugin.docker.client.json.ContainerInfo;
 import org.eclipse.che.plugin.docker.client.params.CommitParams;
 import org.eclipse.che.plugin.docker.client.params.CreateExecParams;
 import org.eclipse.che.plugin.docker.client.params.PushParams;
+import org.eclipse.che.plugin.docker.client.params.PutResourceParams;
 import org.eclipse.che.plugin.docker.client.params.RemoveContainerParams;
 import org.eclipse.che.plugin.docker.client.params.RemoveImageParams;
 import org.eclipse.che.plugin.docker.client.params.StartExecParams;
@@ -37,6 +38,7 @@ import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 
@@ -129,6 +131,14 @@ public class DockerMachine implements Machine {
     public Map<String, ? extends Server> getServers() {
         ServerEvaluationStrategy strategy = provider.get();
         return strategy.getServers(info, "localhost", Collections.emptyMap());
+    }
+
+    public void putResource(String targetPath, InputStream sourceStream) throws InfrastructureException {
+        try {
+            docker.putResource(PutResourceParams.create(container, targetPath, sourceStream));
+        } catch (IOException e) {
+            throw new InfrastructureException(e.getLocalizedMessage(), e);
+        }
     }
 
     public void exec(String script, MessageProcessor<LogMessage> messageProcessor) throws InfrastructureException {

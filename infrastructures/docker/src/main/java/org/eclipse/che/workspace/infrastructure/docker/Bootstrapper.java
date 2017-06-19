@@ -10,24 +10,35 @@
  *******************************************************************************/
 package org.eclipse.che.workspace.infrastructure.docker;
 
+import com.google.gson.Gson;
 import com.google.inject.assistedinject.Assisted;
 
 import org.eclipse.che.api.core.model.workspace.runtime.BootstrapperStatus;
-import org.eclipse.che.api.core.model.workspace.runtime.InstallerStatus;
 import org.eclipse.che.api.core.model.workspace.runtime.RuntimeIdentity;
 import org.eclipse.che.api.core.notification.EventService;
 import org.eclipse.che.api.core.notification.EventSubscriber;
-import org.eclipse.che.api.workspace.server.DtoConverter;
+import org.eclipse.che.api.core.util.LineConsumer;
+import org.eclipse.che.api.core.util.ProcessUtil;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 import org.eclipse.che.api.workspace.server.spi.InternalMachineConfig;
 import org.eclipse.che.api.workspace.shared.dto.RuntimeIdentityDto;
 import org.eclipse.che.api.workspace.shared.dto.event.BootstrapperStatusEvent;
-import org.eclipse.che.api.workspace.shared.dto.event.InstallerLogEvent;
-import org.eclipse.che.api.workspace.shared.dto.event.InstallerStatusEvent;
-import org.eclipse.che.dto.server.DtoFactory;
+import org.eclipse.che.plugin.docker.client.LogMessage;
+import org.eclipse.che.plugin.docker.client.MessageProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Calendar;
+import javax.inject.Named;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -36,12 +47,16 @@ import java.util.concurrent.TimeUnit;
  * @author Sergii Leshchenko
  */
 public class Bootstrapper {
+    private static final Logger LOG = LoggerFactory.getLogger(Bootstrapper.class);
+
     private final    EventService                              eventService;
     private final    String                                    machineName;
     private final    RuntimeIdentity                           runtimeIdentity;
     private final    DockerMachine                             dockerMachine;
+    private final    String                                    apiEndpoint;
     private final    List<InternalMachineConfig.ResolvedAgent> agents;
     private final    CountDownLatch                            latch;
+    private          String                                    machineType;
     private volatile BootstrapperStatusEvent                   resultEvent;
 
     @Inject
@@ -49,12 +64,14 @@ public class Bootstrapper {
                         @Assisted RuntimeIdentity runtimeIdentity,
                         @Assisted DockerMachine dockerMachine,
                         @Assisted List<InternalMachineConfig.ResolvedAgent> agents,
-                        EventService eventService) {
+                        EventService eventService,
+                        @Named("che.api") String apiEndpoint) {
         this.eventService = eventService;
         this.machineName = machineName;
         this.runtimeIdentity = runtimeIdentity;
         this.dockerMachine = dockerMachine;
         this.agents = agents;
+        this.apiEndpoint = apiEndpoint;
         this.latch = new CountDownLatch(1);
     }
 
@@ -94,95 +111,107 @@ public class Bootstrapper {
     }
 
     private void bootstrapAsync() {
-        Thread thread = new Thread(() ->
-                                   {
-                                       eventService.publish(DtoFactory.newDto(BootstrapperStatusEvent.class)
-                                                                      .withMachineName(machineName)
-                                                                      .withRuntimeId(
-                                                                              DtoConverter.asDto(runtimeIdentity))
-                                                                      .withStatus(BootstrapperStatus.AVAILABLE)
-                                                                      .withTime(Calendar.getInstance().toString()));
-
-                                       for (InternalMachineConfig.ResolvedAgent resolvedAgent : agents) {
-                                           try {
-                                               launchAgent(resolvedAgent);
-                                           } catch (InfrastructureException e) {
-                                               eventService.publish(DtoFactory.newDto(BootstrapperStatusEvent.class)
-                                                                              .withMachineName(machineName)
-                                                                              .withRuntimeId(DtoConverter
-                                                                                                     .asDto(runtimeIdentity))
-                                                                              .withStatus(BootstrapperStatus.FAILED)
-                                                                              .withTime(
-                                                                                      Calendar.getInstance().toString())
-                                                                              .withError(e.getMessage()));
-                                               return;
-                                           }
-
-                                           eventService.publish(DtoFactory.newDto(BootstrapperStatusEvent.class)
-                                                                          .withMachineName(machineName)
-                                                                          .withRuntimeId(
-                                                                                  DtoConverter.asDto(runtimeIdentity))
-                                                                          .withStatus(BootstrapperStatus.DONE)
-                                                                          .withTime(Calendar.getInstance().toString()));
-                                       }
-
-                                   });
+        Thread thread = new Thread(new Task());
         thread.setDaemon(true);
         thread.start();
     }
 
-    private void launchAgent(InternalMachineConfig.ResolvedAgent resolvedAgent) throws InfrastructureException {
-        eventService.publish(DtoFactory.newDto(InstallerStatusEvent.class)
-                                       .withStatus(InstallerStatus.STARTING)
-                                       .withMachineName(machineName)
-                                       .withRuntimeId(DtoConverter.asDto(runtimeIdentity))
-                                       .withInstaller(resolvedAgent.getId())
-                                       .withTime(Calendar.getInstance().toString()));
+    class Task implements Runnable {
+        @Override
+        public void run() {
+//            try {
+//                dockerMachine.exec("uname -m", message -> {
+//                    if (message.getType().equals(LogMessage.Type.STDOUT)) {
+//                        machineType = message.getContent();
+//                    }
+//                });
+//            } catch (InfrastructureException e) {
+//                TODO
+//            }
 
-        eventService.publish(DtoFactory.newDto(InstallerStatusEvent.class)
-                                       .withStatus(InstallerStatus.RUNNING)
-                                       .withMachineName(machineName)
-                                       .withRuntimeId(DtoConverter.asDto(runtimeIdentity))
-                                       .withInstaller(resolvedAgent.getId())
-                                       .withTime(Calendar.getInstance().toString()));
 
-        Thread thread = new Thread(() -> {
+//            cp("bootstrapper/bootstrapper", "/home/user/bootstrapper/bootstrapper");
+//
+//            try {
+//                Path config = Files.createTempFile("config", ".json");
+//                Files.write(config, new Gson().toJson(agents).getBytes());
+//                cp(config.toAbsolutePath().toString(), "/home/user/bootstrapper/config.json");
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+
             try {
-                dockerMachine.exec(resolvedAgent.getScript(),
-                                   message -> {
-                                       InstallerLogEvent.Stream stream;
-                                       switch (message.getType()) {
-                                           case STDOUT:
-                                               stream = InstallerLogEvent.Stream.STDOUT;
-                                               break;
-                                           case STDERR:
-                                               stream = InstallerLogEvent.Stream.STDERR;
-                                               break;
-                                           default:
-                                               // do nothing
-                                               return;
-                                       }
-                                       eventService.publish(DtoFactory.newDto(InstallerLogEvent.class)
-                                                                      .withStream(stream)
-                                                                      .withText(message.getContent())
-                                                                      .withMachineName(machineName)
-                                                                      .withRuntimeId(
-                                                                              DtoConverter.asDto(runtimeIdentity))
-                                                                      .withInstaller(resolvedAgent.getId())
-                                                                      .withTime(Calendar.getInstance().toString()));
-                                   }
-                );
+                dockerMachine.putResource("/home/user",
+                                          new ByteArrayInputStream(new Gson().toJson(agents).getBytes()));
             } catch (InfrastructureException e) {
-                eventService.publish(DtoFactory.newDto(InstallerStatusEvent.class)
-                                               .withStatus(InstallerStatus.FAILED)
-                                               .withMachineName(machineName)
-                                               .withRuntimeId(DtoConverter.asDto(runtimeIdentity))
-                                               .withError(e.getMessage())
-                                               .withInstaller(resolvedAgent.getId())
-                                               .withTime(Calendar.getInstance().toString()));
+                throw new RuntimeException(e);
             }
-        });
-        thread.setDaemon(true);
-        thread.start();
+
+            try {
+                dockerMachine.putResource("/home/user/bootstrapper/bootstrapper", Thread.currentThread()
+                                                                                  .getContextClassLoader()
+                                                                                  .getResourceAsStream("bootstrapper/bootstrapper"));
+            } catch (InfrastructureException e) {
+                throw new RuntimeException(e);
+            }
+
+
+            String wsEndpoint = apiEndpoint.replace("http", "ws") + "/installer/websocket/1";
+            try {
+                dockerMachine.exec("/home/user/bootstrapper/bootstrapper " +
+                                   "-machine-name " + machineName + " " +
+                                   "-runtime-id " + String.format("%s:%s:%s", runtimeIdentity.getWorkspaceId(),
+                                                                  runtimeIdentity.getEnvName(),
+                                                                  runtimeIdentity.getOwner()) + " " +
+                                   "-push-endpoint " + wsEndpoint + " ", new MessageProcessor<LogMessage>() {
+                    @Override
+                    public void process(LogMessage message) {
+                        LOG.info(message.getType() + " >> " + message.getContent());
+                    }
+                });
+            } catch (InfrastructureException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private void cp(String resource, String target) {
+            URL resourceUrl = Thread.currentThread()
+                                    .getContextClassLoader()
+                                    .getResource(resource);
+
+            String absolutePath;
+            if (resourceUrl == null) {
+                absolutePath = target;
+            } else {
+                    absolutePath= Paths.get(resource).toAbsolutePath().toString();
+            }
+
+            try {
+                absolutePath = new File(resourceUrl.toURI()).getAbsolutePath();
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                Process process =
+                        ProcessUtil.execute(new ProcessBuilder("/bin/bash", "-c", "docker cp " + absolutePath  + " " + dockerMachine.getContainer() + ":" + target),
+                                            new LineConsumer() {
+                                                @Override
+                                                public void writeLine(String line) throws IOException {
+                                                    LOG.info("CP >>>>> " + line);
+                                                }
+
+                                                @Override
+                                                public void close() throws IOException {
+
+                                                }
+                                            });
+                process.waitFor();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
