@@ -138,16 +138,16 @@ func Parse() {
 
 // Print prints configuration.
 func Print() {
-	log.Print("Bootstrapper Configuration")
-	log.Printf("  Push Endpoint: %s", PushStatusesEndpoint)
-	log.Printf("  Push Logs Endpoint: %s", PushLogsEndpoint)
+	log.Print("Bootstrapper configuration")
+	log.Printf("  Push endpoint: %s", PushStatusesEndpoint)
+	log.Printf("  Push logs Endpoint: %s", PushLogsEndpoint)
 	log.Print("  Runtime ID:")
 	log.Printf("    Workspace: %s", RuntimeID.Workspace)
 	log.Printf("    Environment: %s", RuntimeID.Environment)
 	log.Printf("    Owner: %s", RuntimeID.Owner)
-	log.Printf("  Machine Name: %s", MachineName)
-	log.Printf("  Installer Timeout: %dseconds", InstallerTimeoutSec)
-	log.Printf("  Check Servers Period: %dseconds", CheckServersPeriodSec)
+	log.Printf("  Machine name: %s", MachineName)
+	log.Printf("  Installer timeout: %dseconds", InstallerTimeoutSec)
+	log.Printf("  Check servers period: %dseconds", CheckServersPeriodSec)
 }
 
 // ReadInstallersConfig reads content of file by path cfg.FilePath,
